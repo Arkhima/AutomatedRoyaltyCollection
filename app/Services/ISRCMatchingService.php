@@ -9,11 +9,7 @@ use Illuminate\Support\Facades\Log;
 class ISRCMatchingService
 {
     /**
-     * Import usage data from an array of rows using ISRC code matching.
-     *
-     * @param array $rows - array of usage data rows (from CSV or API)
-     *                      Expected format: ['isrc' => string, 'streams' => int, 'date' => optional string]
-     * @return int Number of matched records saved
+     * Import usage data from CSV/API using ISRC code (and optional artist ID)
      */
     public function importUsageData(array $rows): int
     {
@@ -25,10 +21,17 @@ class ISRCMatchingService
                 continue;
             }
 
-            $track = Track::where('isrc_code', $row['isrc'])->first();
+            $query = Track::where('isrc_code', $row['isrc']);
+
+            if (!empty($row['artist_id'])) {
+                $query->where('artist_id', $row['artist_id']);
+            }
+
+            $track = $query->first();
 
             if (!$track) {
-                Log::info("No matching track found for ISRC: {$row['isrc']}");
+               $artistIdText = isset($row['artist_id']) ? $row['artist_id'] : 'N/A';
+                                    Log::info("No matching track found for ISRC: {$row['isrc']} (Artist: {$artistIdText})");
                 continue;
             }
 

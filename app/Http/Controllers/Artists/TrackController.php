@@ -26,7 +26,7 @@ class TrackController extends Controller
     {
         $data = $request->validate([
             'title' => 'required|string',
-            'isrc_code' => 'nullable|string',
+            'isrc_code' => 'required|string|unique:tracks,isrc_code,NULL,id,artist_id,' . $request->artist_id,
             'artist_id' => 'required|exists:artists,id',
             'rate_per_stream' => 'required|numeric',
             'file_path' => 'nullable|file|mimes:mp3,wav,flac'
@@ -56,7 +56,7 @@ class TrackController extends Controller
 
         $data = $request->validate([
             'title' => 'required|string',
-            'isrc_code' => 'nullable|string',
+            'isrc_code' => 'required|string|unique:tracks,isrc_code,' . $track->id . ',id,artist_id,' . $request->artist_id,
             'artist_id' => 'required|exists:artists,id',
             'rate_per_stream' => 'required|numeric',
             'file_path' => 'nullable|file|mimes:mp3,wav,flac'

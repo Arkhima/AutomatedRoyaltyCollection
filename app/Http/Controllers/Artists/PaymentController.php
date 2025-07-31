@@ -5,19 +5,31 @@ namespace App\Http\Controllers\Artists;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Payment;
-use App\Models\Artist;
 use Illuminate\Support\Facades\Auth;
 
 class PaymentController extends Controller
 {
+    /**
+     * Display a listing of the artist's payments.
+     */
     public function index()
     {
-        $artistId = 1; // TODO: Replace with Auth::id() or actual artist logic
-        $payments = Payment::where('artist_id', $artistId)->latest()->get();
+        $artistId = Auth::user()?->artist_id;
+
+        if (!$artistId) {
+            return redirect()->back()->with('error', 'Artist account not found.');
+        }
+
+        $payments = Payment::where('artist_id', $artistId)
+            ->latest()
+            ->get();
 
         return view('Artists.Payments.index', compact('payments'));
     }
 
+    /**
+     * Handle a payment withdrawal request.
+     */
     public function request(Request $request)
     {
         $request->validate([
@@ -25,13 +37,18 @@ class PaymentController extends Controller
             'method' => 'required|in:mpesa,bank',
         ]);
 
-        $artistId = 1; // Replace with Auth::id()
+        $artistId = Auth::user()?->artist_id;
+
+        if (!$artistId) {
+            return redirect()->back()->with('error', 'Artist account not found.');
+        }
+
         Payment::create([
             'artist_id' => $artistId,
             'amount' => $request->amount,
             'method' => $request->method,
             'status' => 'pending',
-            'requested_at' => now()
+            'requested_at' => now(),
         ]);
 
         return redirect()->back()->with('success', 'Withdrawal request submitted!');

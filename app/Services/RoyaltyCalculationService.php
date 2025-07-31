@@ -4,20 +4,44 @@ namespace App\Services;
 
 use App\Models\Track;
 use Illuminate\Support\Collection;
+use Carbon\Carbon;
 
 class RoyaltyCalculationService
 {
     /**
-     * Calculate royalties for all tracks.
+     * Calculate royalties for all tracks, optionally filtered by artist and date range.
      *
-     * @return \Illuminate\Support\Collection
+     * @param int|null $artistId
+     * @param string|null $startDate (Y-m-d format)
+     * @param string|null $endDate (Y-m-d format)
+     * @return Collection
      */
-    public function calculateRoyalties(): Collection
+    public function calculateRoyalties(?int $artistId = null, ?string $startDate = null, ?string $endDate = null): Collection
     {
-        $tracks = Track::with(['streams', 'artist'])->get();
+        $query = Track::with(['streams', 'artist']);
 
-        return $tracks->map(function ($track) {
-            $totalStreams = $track->streams->sum('stream_count');
+        if ($artistId) {
+            $query->where('artist_id', $artistId);
+        }
+
+        $tracks = $query->get();
+
+        // Parse dates if provided
+        $start = $startDate ? Carbon::parse($startDate)->startOfDay() : null;
+        $end = $endDate ? Carbon::parse($endDate)->endOfDay() : null;
+
+        return $tracks->map(function ($track) use ($start, $end) {
+            $streams = $track->streams;
+
+            // Filter streams by date range if set
+            if ($start && $end) {
+                $streams = $streams->filter(function ($stream) use ($start, $end) {
+                    $date = Carbon::parse($stream->as_of_date);
+                    return $date->between($start, $end);
+                });
+            }
+
+            $totalStreams = $streams->sum('stream_count');
             $royaltyEarned = $totalStreams * $track->rate_per_stream;
 
             return [

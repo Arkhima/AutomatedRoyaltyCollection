@@ -20,6 +20,11 @@ class Artist extends Model
         'profile_image',
     ];
 
+    public function user()
+    {
+        return $this->hasOne(User::class);
+    }
+
     public function tracks()
     {
         return $this->hasMany(Track::class);
@@ -27,7 +32,6 @@ class Artist extends Model
 
     public function streams()
     {
-    return $this->hasMany(Stream::class);
+        return $this->hasMany(Stream::class);
     }
-
 }

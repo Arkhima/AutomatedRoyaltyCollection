@@ -168,6 +168,31 @@
       height: 40px;
       border-radius: 50%;
       object-fit: cover;
+      cursor: pointer;
+    }
+
+    .user-profile a {
+      color: white;
+      font-weight: 500;
+      transition: color 0.3s ease;
+      text-decoration: none;
+    }
+
+    .user-profile a:hover {
+      color: #f2c94c;
+      text-decoration: underline;
+    }
+
+    .user-profile button {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: color 0.3s ease;
+    }
+    .user-profile button:hover {
+      color: #f2c94c;
     }
 
     /* Animated marquee banner */
@@ -309,12 +334,34 @@
         </div>
 
         <div class="animated-banner" aria-label="Creative inspirational banner">
-          <span>🎨 Inspire. Create. Repeat. — Let your music for you! ✨</span>
+          <span>🎨 Inspire. Create. Repeat. — Let your music speak for you! ✨</span>
         </div>
 
-        <div class="user-profile">
-          <span class="text-gray-600 font-medium" style="color: white">My Profile</span>
-          <img src="https://via.placeholder.com/40" alt="User Avatar" />
+        <div class="user-profile flex items-center gap-3">
+          <a href="{{ route('Artists.Profile.show') }}" 
+             class="text-white font-medium hover:text-yellow-400 transition-colors" 
+             title="Go to My Profile">
+            My Profile
+          </a>
+          
+          <a href="{{ route('Artists.Profile.show') }}" title="Go to My Profile">
+            <img src="https://via.placeholder.com/40" alt="User Avatar" class="rounded-full object-cover" />
+          </a>
+
+          <!-- Logout Form -->
+          <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+            @csrf
+          </form>
+
+          <!-- Logout Button with confirmation -->
+          <button
+            onclick="confirmLogout(event)"
+            title="Logout"
+            aria-label="Logout"
+            class="text-white font-semibold hover:text-yellow-400 transition-colors"
+          >
+            <i class="fas fa-sign-out-alt"></i>
+          </button>
         </div>
       </header>
 
@@ -338,6 +385,13 @@
         layout.classList.toggle('sidebar-open');
       } else {
         layout.classList.toggle('collapsed');
+      }
+    }
+
+    function confirmLogout(event) {
+      event.preventDefault();
+      if (confirm('Are you sure you want to logout?')) {
+        document.getElementById('logout-form').submit();
       }
     }
   </script>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Artists;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Artist;
+use Illuminate\Support\Facades\Storage;
 
 class ArtistController extends Controller
 {
@@ -29,12 +30,11 @@ class ArtistController extends Controller
             'bank_details' => 'nullable|string',
             'mpesa_paybill' => 'nullable|string',
             'national_id' => 'nullable|string',
-            'profile_image' => 'nullable|image|mimes:jpg,png,jpeg'
+            'profile_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
         ]);
 
         if ($request->hasFile('profile_image')) {
-            $path = $request->file('profile_image')->store('artist_profiles');
-            $data['profile_image'] = $path;
+            $data['profile_image'] = $request->file('profile_image')->store('artist_profiles', 'public');
         }
 
         Artist::create($data);
@@ -61,12 +61,16 @@ class ArtistController extends Controller
             'bank_details' => 'nullable|string',
             'mpesa_paybill' => 'nullable|string',
             'national_id' => 'nullable|string',
-            'profile_image' => 'nullable|image|mimes:jpg,png,jpeg'
+            'profile_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
         ]);
 
         if ($request->hasFile('profile_image')) {
-            $path = $request->file('profile_image')->store('artist_profiles');
-            $data['profile_image'] = $path;
+            // Optionally delete old image if needed
+            if ($artist->profile_image) {
+                Storage::disk('public')->delete($artist->profile_image);
+            }
+
+            $data['profile_image'] = $request->file('profile_image')->store('artist_profiles', 'public');
         }
 
         $artist->update($data);
@@ -78,6 +82,11 @@ class ArtistController extends Controller
     public function destroy($id)
     {
         $artist = Artist::findOrFail($id);
+
+        if ($artist->profile_image) {
+            Storage::disk('public')->delete($artist->profile_image);
+        }
+
         $artist->delete();
 
         return redirect()->route('Artists.ArtistSection.index')
