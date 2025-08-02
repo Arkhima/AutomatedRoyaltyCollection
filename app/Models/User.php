@@ -14,7 +14,12 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'artist_id'
+        'artist_id',
+        'phone_number',
+        'bio',
+        'avatar_url',
+        'instagram',
+        'twitter',
     ];
 
     protected $hidden = [
@@ -32,6 +37,6 @@ class User extends Authenticatable
 
     public function artist()
     {
-        return $this->belongsTo(Artist::class);
+        return $this->hasOne(Artist::class);
     }
 }

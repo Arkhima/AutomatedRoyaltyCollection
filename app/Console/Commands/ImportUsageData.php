@@ -3,42 +3,61 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Services\ISRCMatchingService;
 use App\Models\Track;
+use App\Models\Artist;
+use App\Services\ISRCMatchingService;
+use Carbon\Carbon;
 
 class ImportUsageData extends Command
 {
-    protected $signature = 'usage:import {--count=50 : Number of dummy records to create}';
-    protected $description = 'Generate and import demo streaming data';
+    protected $signature = 'usage:import 
+        {--count=50 : Number of demo records to generate} 
+        {--artist= : ID of the artist whose tracks to use}';
 
-    public function __construct(
-        private ISRCMatchingService $isrcService
-    ) {
+    protected $description = 'Generate and import demo streaming data for a specific artist';
+
+    public function __construct(private ISRCMatchingService $isrcService)
+    {
         parent::__construct();
     }
 
     public function handle(): int
     {
-        $count = $this->option('count');
-        $tracks = Track::with('artist')->limit(10)->get();
+        $artistId = $this->option('artist');
+        $count = (int) $this->option('count');
 
-        if ($tracks->isEmpty()) {
-            $this->error('No tracks found. Seed tracks first!');
+        // Validate artist
+        $artist = Artist::find($artistId);
+
+        if (!$artist) {
+            $this->error("Artist not found. Use --artist=ID to specify a valid artist.");
             return Command::FAILURE;
         }
 
-        $dummyData = collect()->times($count, function() use ($tracks) {
+        // Fetch artist's tracks
+        $tracks = $artist->tracks;
+
+        if ($tracks->isEmpty()) {
+            $this->warn("This artist has no tracks. Upload at least one to generate streams.");
+            return Command::SUCCESS;
+        }
+
+        // Generate fake stream data across 2025
+        $demoData = collect()->times($count, function () use ($tracks) {
             $track = $tracks->random();
+
             return [
-                'isrc' => $track->isrc_code,
+                'isrc'      => $track->isrc_code,
                 'artist_id' => $track->artist_id,
-                'streams' => rand(1000, 100000),
-                'date' => now()->subDays(rand(0, 365))->format('Y-m-d'),
+                'streams'   => rand(100, 10000),
+                'date'      => Carbon::create(2025, rand(1, 12), rand(1, 28))->format('Y-m-d'),
             ];
         });
 
-        $imported = $this->isrcService->importUsageData($dummyData->toArray());
-        $this->info("Generated {$imported} demo stream records.");
+        // Import
+        $imported = $this->isrcService->importUsageData($demoData->toArray());
+
+        $this->info("✅ Successfully imported {$imported} stream records for artist ID {$artistId}");
         return Command::SUCCESS;
     }
 }

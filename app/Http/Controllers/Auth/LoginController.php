@@ -20,10 +20,15 @@ class LoginController extends Controller
             'password' => ['required'],
         ]);
 
-        if (Auth::attempt($credentials, $request->filled('remember'))) {
-            $request->session()->regenerate();
-            return redirect()->intended('/dashboard')->with('success', 'Logged in successfully.');
-        }
+       if (Auth::attempt($credentials, $request->filled('remember'))) {
+    $request->session()->regenerate();
+    return redirect()->intended('/dashboard')->with('success', 'Logged in successfully.');
+} else {
+    \Log::info('Login failed for email: ' . $request->email);
+    return back()->withErrors([
+        'email' => 'Invalid credentials.',
+    ])->onlyInput('email');
+}
 
         return back()->withErrors([
             'email' => 'Invalid credentials.',

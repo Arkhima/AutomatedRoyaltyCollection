@@ -5,31 +5,35 @@ namespace App\Http\Controllers\Artists;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Payment;
+use App\Models\Royalty;
 use Illuminate\Support\Facades\Auth;
 
 class PaymentController extends Controller
 {
-    /**
-     * Display a listing of the artist's payments.
-     */
     public function index()
     {
-        $artistId = Auth::user()?->artist_id;
+        $artist = Auth::user()->artist;
 
-        if (!$artistId) {
-            return redirect()->back()->with('error', 'Artist account not found.');
+        if (!$artist) {
+            return redirect()->route('Artists.Dashboard.index')->with('error', 'Artist account not found.');
         }
 
-        $payments = Payment::where('artist_id', $artistId)
-            ->latest()
-            ->get();
+        $artistId = $artist->id;
 
-        return view('Artists.Payments.index', compact('payments'));
+        $totalRoyalties = Royalty::where('artist_id', $artistId)->sum('total_royalty');
+
+        $withdrawn = Payment::where('artist_id', $artistId)
+            ->where('type', 'royalty')
+            ->whereIn('status', ['approved', 'completed'])
+            ->sum('amount');
+
+        $availableBalance = $totalRoyalties - $withdrawn;
+
+        $payments = Payment::where('artist_id', $artistId)->latest()->get();
+
+        return view('Artists.Payments.index', compact('payments', 'availableBalance'));
     }
 
-    /**
-     * Handle a payment withdrawal request.
-     */
     public function request(Request $request)
     {
         $request->validate([
@@ -37,17 +41,33 @@ class PaymentController extends Controller
             'method' => 'required|in:mpesa,bank',
         ]);
 
-        $artistId = Auth::user()?->artist_id;
+        $artist = Auth::user()->artist;
 
-        if (!$artistId) {
-            return redirect()->back()->with('error', 'Artist account not found.');
+        if (!$artist) {
+            return redirect()->route('Artists.Dashboard.index')->with('error', 'Artist account not found.');
+        }
+
+        $artistId = $artist->id;
+
+        $totalRoyalties = Royalty::where('artist_id', $artistId)->sum('total_royalty');
+
+        $withdrawn = Payment::where('artist_id', $artistId)
+            ->where('type', 'royalty')
+            ->whereIn('status', ['approved', 'completed'])
+            ->sum('amount');
+
+        $availableBalance = $totalRoyalties - $withdrawn;
+
+        if ($request->amount > $availableBalance) {
+            return redirect()->back()->with('error', 'Withdrawal amount exceeds available royalties.');
         }
 
         Payment::create([
-            'artist_id' => $artistId,
-            'amount' => $request->amount,
-            'method' => $request->method,
-            'status' => 'pending',
+            'artist_id'    => $artistId,
+            'amount'       => $request->amount,
+            'method'       => $request->method,
+            'status'       => 'pending',
+            'type'         => 'royalty',
             'requested_at' => now(),
         ]);
 

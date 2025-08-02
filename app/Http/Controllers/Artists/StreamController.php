@@ -15,7 +15,7 @@ class StreamController extends Controller
 {
     public function __construct(private ISRCMatchingService $isrcService)
     {
-        $this->middleware('auth'); // Still enforce login
+        $this->middleware('auth');
     }
 
     public function index(Request $request)
@@ -91,9 +91,22 @@ class StreamController extends Controller
 
     public function generateDemo()
     {
-        Artisan::call('usage:import', ['--count' => 50]);
+        $artist = Auth::user()->artist;
 
-        return back()->with('success', '50 demo stream records generated!');
+        if (!$artist) {
+            return back()->with('error', 'You must have an artist profile to generate demo streams.');
+        }
+
+        if ($artist->tracks()->count() === 0) {
+            return back()->with('error', 'Please upload at least one track before generating demo streams.');
+        }
+
+        Artisan::call('usage:import', [
+            '--artist' => $artist->id,
+            '--count' => 50
+        ]);
+
+        return back()->with('success', '50 demo stream records generated for your tracks!');
     }
 
     public function downloadTemplate()

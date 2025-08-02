@@ -45,8 +45,10 @@ Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth')->
 Route::middleware(['auth'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('Artists.Dashboard.index');
-     Route::get('/artist/profile', [ArtistProfileController::class, 'show'])->name('Artists.Profile.show');
-     Route::put('/artist/profile', [ArtistProfileController::class, 'update'])->name('Artists.Profile.update');
+
+    // Artist Profile
+    Route::get('/artist/profile', [ArtistProfileController::class, 'show'])->name('Artists.Profile.show');
+    Route::put('/artist/profile', [ArtistProfileController::class, 'update'])->name('Artists.Profile.update');
 
     // Track Routes
     Route::resource('/tracks', TrackController::class)->names([
@@ -58,7 +60,7 @@ Route::middleware(['auth'])->group(function () {
         'destroy' => 'Artists.Tracks.destroy',
     ]);
 
-    // Artist Profile Routes (fixed resource route)
+    // Artist Profile Routes (resource under prefix)
     Route::prefix('artist-profile')->name('Artists.ArtistSection.')->group(function () {
         Route::resource('', ArtistController::class)->parameters(['' => 'artist'])->names([
             'index'   => 'index',
@@ -86,17 +88,19 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/export', [RoyaltyController::class, 'export'])->name('export');
     });
 
-    // Report Routes
-    Route::prefix('reports')->name('Artists.Reports.')->group(function () {
-        Route::get('/', [ReportController::class, 'index'])->name('index');
-        Route::get('/generate', [ReportController::class, 'generate'])->name('generate');
-    });
+   // Report Routes
+Route::prefix('reports')->name('Artists.Reports.')->group(function () {
+    Route::get('/', [ReportController::class, 'index'])->name('index');
+    Route::get('/generate/{format?}', [ReportController::class, 'generate'])
+        ->name('generate')
+        ->where('format', 'pdf|excel'); // Optional 'pdf' or 'excel' format parameter
+});
+
 
     // Payment Routes
     Route::prefix('payments')->name('Artists.Payments.')->group(function () {
         Route::get('/', [PaymentController::class, 'index'])->name('index');
         Route::get('/history', [PaymentController::class, 'history'])->name('history');
+        Route::post('/request', [PaymentController::class, 'request'])->name('request'); // Added route for withdrawal request
     });
 });
-
-

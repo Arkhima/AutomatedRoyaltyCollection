@@ -9,11 +9,22 @@
     </div>
 @endif
 
+@if(session('error'))
+    <div class="bg-red-100 text-red-800 p-3 rounded mb-4">
+        {{ session('error') }}
+    </div>
+@endif
+
+<div class="mb-6">
+    <p class="text-xl">💰 <strong>Available Royalties:</strong> Ksh {{ number_format($availableBalance, 2) }}</p>
+</div>
+
 <form method="POST" action="{{ route('Artists.Payments.request') }}" class="mb-6">
     @csrf
-    <div class="flex gap-4">
+    <div class="flex gap-4 items-center">
         <input type="number" name="amount" placeholder="Amount (Ksh)" class="border p-2 rounded w-1/3" required>
         <select name="method" class="border p-2 rounded w-1/3" required>
+            <option value="">Select Method</option>
             <option value="mpesa">M-Pesa</option>
             <option value="bank">Bank</option>
         </select>
@@ -21,6 +32,7 @@
     </div>
 </form>
 
+@if($payments->count())
 <table class="w-full bg-white shadow rounded">
     <thead class="bg-gray-800 text-white">
         <tr>
@@ -36,11 +48,14 @@
         <tr class="border-b">
             <td class="py-2 px-4">Ksh {{ number_format($payment->amount, 2) }}</td>
             <td class="py-2 px-4">{{ ucfirst($payment->method) }}</td>
-            <td class="py-2 px-4">{{ ucfirst($payment->status) }}</td>
-            <td class="py-2 px-4">{{ $payment->requested_at ?? '-' }}</td>
-            <td class="py-2 px-4">{{ $payment->processed_at ?? '-' }}</td>
+            <td class="py-2 px-4 capitalize">{{ $payment->status }}</td>
+            <td class="py-2 px-4">{{ $payment->requested_at ? $payment->requested_at->format('Y-m-d') : '-' }}</td>
+            <td class="py-2 px-4">{{ $payment->processed_at ? $payment->processed_at->format('Y-m-d') : '-' }}</td>
         </tr>
     @endforeach
     </tbody>
 </table>
+@else
+<p class="text-gray-600">No payments yet.</p>
+@endif
 @endsection

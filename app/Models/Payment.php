@@ -15,6 +15,11 @@ class Payment extends Model
         'processed_at',
     ];
 
+    protected $casts = [
+        'requested_at' => 'datetime',
+        'processed_at' => 'datetime',
+    ];
+
     public function artist()
     {
         return $this->belongsTo(Artist::class);

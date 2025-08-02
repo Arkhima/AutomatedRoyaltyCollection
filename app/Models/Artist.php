@@ -10,19 +10,23 @@ class Artist extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'stage_name',
-        'email',
-        'phone',
-        'bank_details',
-        'mpesa_paybill',
-        'national_id',
-        'profile_image',
+        'user_id',
+    'name',
+    'stage_name',
+    'email',
+    'phone',
+    'bank_details',
+    'mpesa_paybill',
+    'national_id',
+    'profile_image',
+    'bio',
+    'instagram',
+    'twitter',
     ];
 
     public function user()
     {
-        return $this->hasOne(User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function tracks()

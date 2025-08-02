@@ -12,8 +12,9 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('artist_id');
             $table->decimal('amount', 10, 2);
-            $table->string('method'); // e.g., mpesa or bank
+            $table->string('method'); // mpesa, bank, etc.
             $table->enum('status', ['pending', 'approved', 'rejected', 'completed'])->default('pending');
+            $table->enum('type', ['royalty', 'other'])->default('royalty');
             $table->timestamp('requested_at')->nullable();
             $table->timestamp('processed_at')->nullable();
             $table->timestamps();

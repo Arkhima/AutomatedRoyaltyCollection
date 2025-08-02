@@ -28,14 +28,12 @@ class ArtistController extends Controller
             'email' => 'required|email|unique:artists,email',
             'phone' => 'nullable|string|max:20',
             'bank_details' => 'nullable|string',
-            'mpesa_paybill' => 'nullable|string',
             'national_id' => 'nullable|string',
-            'profile_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+            // 'mpesa_paybill' removed
+            // 'profile_image' removed
         ]);
 
-        if ($request->hasFile('profile_image')) {
-            $data['profile_image'] = $request->file('profile_image')->store('artist_profiles', 'public');
-        }
+        // Removed profile_image upload logic
 
         Artist::create($data);
 
@@ -59,19 +57,12 @@ class ArtistController extends Controller
             'email' => 'required|email|unique:artists,email,' . $artist->id,
             'phone' => 'nullable|string|max:20',
             'bank_details' => 'nullable|string',
-            'mpesa_paybill' => 'nullable|string',
             'national_id' => 'nullable|string',
-            'profile_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+            // 'mpesa_paybill' removed
+            // 'profile_image' removed
         ]);
 
-        if ($request->hasFile('profile_image')) {
-            // Optionally delete old image if needed
-            if ($artist->profile_image) {
-                Storage::disk('public')->delete($artist->profile_image);
-            }
-
-            $data['profile_image'] = $request->file('profile_image')->store('artist_profiles', 'public');
-        }
+        // Removed profile_image upload logic and deletion
 
         $artist->update($data);
 
@@ -83,9 +74,7 @@ class ArtistController extends Controller
     {
         $artist = Artist::findOrFail($id);
 
-        if ($artist->profile_image) {
-            Storage::disk('public')->delete($artist->profile_image);
-        }
+        // Removed profile_image deletion
 
         $artist->delete();
 

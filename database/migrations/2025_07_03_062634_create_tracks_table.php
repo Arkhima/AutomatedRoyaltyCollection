@@ -9,6 +9,7 @@ class CreateTracksTable extends Migration
     public function up()
     {
         Schema::create('tracks', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->id();
             $table->string('title');
             $table->string('isrc_code')->nullable(); // ✅ NEW FIELD
