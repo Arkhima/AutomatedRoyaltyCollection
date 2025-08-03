@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+
 use App\Http\Controllers\Auth\{
     LoginController,
     RegisterController,
@@ -16,12 +18,15 @@ use App\Http\Controllers\Artists\{
     ReportController,
     PaymentController
 };
-
 use App\Http\Controllers\ArtistProfileController;
 
-// Home
+
+// ✅ Fixed: Root Route now redirects based on authentication status
 Route::get('/', function () {
-    return view('auth.login');
+    if (Auth::check()) {
+        return redirect()->route('Artists.Dashboard.index');
+    }
+    return redirect()->route('login');
 });
 
 // Guest Routes
@@ -88,14 +93,13 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/export', [RoyaltyController::class, 'export'])->name('export');
     });
 
-   // Report Routes
-Route::prefix('reports')->name('Artists.Reports.')->group(function () {
-    Route::get('/', [ReportController::class, 'index'])->name('index');
-    Route::get('/generate/{format?}', [ReportController::class, 'generate'])
-        ->name('generate')
-        ->where('format', 'pdf|excel'); // Optional 'pdf' or 'excel' format parameter
-});
-
+    // Report Routes
+    Route::prefix('reports')->name('Artists.Reports.')->group(function () {
+        Route::get('/', [ReportController::class, 'index'])->name('index');
+        Route::get('/generate/{format?}', [ReportController::class, 'generate'])
+            ->name('generate')
+            ->where('format', 'pdf|excel'); // Optional 'pdf' or 'excel' format parameter
+    });
 
     // Payment Routes
     Route::prefix('payments')->name('Artists.Payments.')->group(function () {

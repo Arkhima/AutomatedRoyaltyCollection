@@ -12,28 +12,34 @@ class LoginController extends Controller
     {
         return view('auth.login');
     }
+public function login(Request $request)
+{
+    $credentials = $request->validate([
+        'email'    => ['required', 'email'],
+        'password' => ['required'],
+    ]);
 
-    public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email'    => ['required', 'email'],
-            'password' => ['required'],
-        ]);
+    if (Auth::attempt($credentials, $request->filled('remember'))) {
+        $request->session()->regenerate();
 
-       if (Auth::attempt($credentials, $request->filled('remember'))) {
-    $request->session()->regenerate();
-    return redirect()->intended('/dashboard')->with('success', 'Logged in successfully.');
-} else {
-    \Log::info('Login failed for email: ' . $request->email);
-    return back()->withErrors([
-        'email' => 'Invalid credentials.',
-    ])->onlyInput('email');
-}
+        // Optional: Make sure user has an associated artist
+        $user = Auth::user();
+        if (!$user->artist) {
+            Auth::logout();
+            return redirect('/login')->withErrors([
+                'email' => 'Your account is not linked to an artist profile.',
+            ]);
+        }
 
+        return redirect()->intended('/dashboard')->with('success', 'Logged in successfully.');
+    } else {
+        \Log::info('Login failed for email: ' . $request->email);
         return back()->withErrors([
             'email' => 'Invalid credentials.',
         ])->onlyInput('email');
     }
+}
+
 
     public function logout(Request $request)
     {

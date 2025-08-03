@@ -15,7 +15,8 @@ class DashboardController extends Controller
         $artist = Auth::user()->artist;
 
         if (!$artist) {
-            return redirect()->route('Artists.Dashboard.index')->with('error', 'Artist account not found.');
+            Auth::logout();
+            return redirect('/login')->with('error', 'No artist account linked. Please log in again.');
         }
 
         $artistId = $artist->id;

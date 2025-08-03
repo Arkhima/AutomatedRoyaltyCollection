@@ -17,38 +17,43 @@ class RegisterController extends Controller
     }
 
     public function register(Request $request)
-    {
-        $validated = $request->validate([
-            'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'email', 'max:255', 'unique:users'],
-            'password' => [
-                'required',
-                'string',
-                'min:8',
-                'regex:/[A-Z]/',      // at least one uppercase
-                'regex:/[a-z]/',      // at least one lowercase
-                'regex:/[0-9]/',      // at least one number
-                'regex:/[@$!%*#?&]/', // at least one special char
-                'confirmed'
-            ]
-        ]);
+{
+    $validated = $request->validate([
+        'name'     => ['required', 'string', 'max:255'],
+        'email'    => ['required', 'email', 'max:255', 'unique:users'],
+        'password' => [
+            'required',
+            'string',
+            'min:8',
+            'regex:/[A-Z]/',      // at least one uppercase
+            'regex:/[a-z]/',      // at least one lowercase
+            'regex:/[0-9]/',      // at least one number
+            'regex:/[@$!%*#?&]/', // at least one special char
+            'confirmed'
+        ]
+    ]);
 
-        // Create artist profile first
-        $artist = Artist::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-        ]);
+    // Step 1: Create the user (without artist_id yet)
+    $user = User::create([
+        'name'     => $validated['name'],
+        'email'    => $validated['email'],
+        'password' => Hash::make($validated['password']),
+    ]);
 
-        // Create user and associate artist
-        $user = User::create([
-            'name'      => $validated['name'],
-            'email'     => $validated['email'],
-            'password'  => Hash::make($validated['password']),
-            'artist_id' => $artist->id,
-        ]);
+    // Step 2: Create the artist and link it to the user
+    $artist = Artist::create([
+        'user_id' => $user->id, // this is the important link
+        'name'    => $user->name,
+        'email'   => $user->email,
+    ]);
 
-        Auth::login($user);
+    // Step 3 (optional): store artist_id back into user, if you're using it
+    $user->artist_id = $artist->id;
+    $user->save();
 
-        return redirect('/dashboard')->with('success', 'Account created and artist profile set up.');
-    }
+    // Step 4: Log in and redirect
+    Auth::login($user);
+
+    return redirect('/dashboard')->with('success', 'Account created and artist profile set up.');
+}
 }
