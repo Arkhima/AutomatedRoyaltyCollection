@@ -1,130 +1,126 @@
 @extends('layouts.Auth')
 
 @section('title', 'Create Account')
-@section('subtitle', 'Join our creative community')
+@section('subtitle', 'Join the ARC creative community')
 
 @section('content')
-<form class="space-y-6" action="{{ route('register') }}" method="POST">
-    @csrf
-    
-    @if ($errors->any())
-        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">
-            <ul class="list-disc list-inside">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
+<div class="animate-fadeInUp delay-200">
+    <form class="space-y-6" action="{{ route('register') }}" method="POST">
+        @csrf
+
+        @if ($errors->any())
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded text-sm">
+                <ul class="list-disc list-inside">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <div>
+            <label for="name" class="block text-sm font-medium text-white mb-1">Full Name</label>
+            <input id="name" name="name" type="text" value="{{ old('name') }}" autocomplete="name" required
+                class="w-full px-4 py-3 rounded-lg border border-gray-400 bg-white bg-opacity-80 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500" 
+                placeholder="Your full name">
+        </div>
+
+        <div>
+            <label for="email" class="block text-sm font-medium text-white mb-1">Email Address</label>
+            <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" required
+                class="w-full px-4 py-3 rounded-lg border border-gray-400 bg-white bg-opacity-80 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500" 
+                placeholder="your@email.com">
+        </div>
+
+        <div>
+            <label for="password" class="block text-sm font-medium text-white mb-1">Password</label>
+            <input id="password" name="password" type="password" autocomplete="new-password" required
+                class="w-full px-4 py-3 rounded-lg border border-gray-400 bg-white bg-opacity-80 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                placeholder="••••••••">
+
+            <ul class="mt-2 pl-4 list-disc space-y-1 text-xs text-white/70">
+                <li class="password-requirement hidden" data-requirement="length">At least 8 characters</li>
+                <li class="password-requirement hidden" data-requirement="uppercase">One uppercase letter</li>
+                <li class="password-requirement hidden" data-requirement="lowercase">One lowercase letter</li>
+                <li class="password-requirement hidden" data-requirement="number">One number</li>
+                <li class="password-requirement hidden" data-requirement="special">One special character (@$!%*#?&)</li>
             </ul>
         </div>
-    @endif
 
-    <div>
-        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-        <input id="name" name="name" type="text" value="{{ old('name') }}" autocomplete="name" required
-               class="w-full px-4 py-3 rounded-lg border border-gray-300 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent input-focus"
-               placeholder="Your full name">
-    </div>
-
-    <div>
-        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-        <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" required
-               class="w-full px-4 py-3 rounded-lg border border-gray-300 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent input-focus"
-               placeholder="your@email.com">
-    </div>
-
-    <div>
-        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-        <input id="password" name="password" type="password" autocomplete="new-password" required
-               class="w-full px-4 py-3 rounded-lg border border-gray-300 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent input-focus"
-               placeholder="••••••••">
-        <div class="mt-2 text-xs text-gray-500">
-            <p>Password must contain:</p>
-            <ul class="list-disc list-inside pl-3">
-                <li class="password-requirement" data-requirement="length">At least 8 characters</li>
-                <li class="password-requirement" data-requirement="uppercase">One uppercase letter</li>
-                <li class="password-requirement" data-requirement="lowercase">One lowercase letter</li>
-                <li class="password-requirement" data-requirement="number">One number</li>
-                <li class="password-requirement" data-requirement="special">One special character (@$!%*#?&)</li>
-            </ul>
+        <div>
+            <label for="password_confirmation" class="block text-sm font-medium text-white mb-1">Confirm Password</label>
+            <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required
+                class="w-full px-4 py-3 rounded-lg border border-gray-400 bg-white bg-opacity-80 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                placeholder="••••••••">
         </div>
-    </div>
 
-    <div>
-        <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-        <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required
-               class="w-full px-4 py-3 rounded-lg border border-gray-300 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent input-focus"
-               placeholder="••••••••">
-    </div>
-
-    <div class="flex items-start">
-        <div class="flex items-center h-5">
-            <input id="terms" name="terms" type="checkbox" class="focus:ring-purple-500 h-4 w-4 text-purple-600 border-gray-300 rounded" required>
+        <div class="flex items-start">
+            <input id="terms" name="terms" type="checkbox" required
+                class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
+            <label for="terms" class="ml-2 text-sm text-white">
+                I agree to the <a href="#" class="text-purple-400 underline">Terms</a> and <a href="#" class="text-purple-400 underline">Privacy Policy</a>.
+            </label>
         </div>
-        <div class="ml-3 text-sm">
-            <label for="terms" class="font-medium text-gray-700">I agree to the <a href="#" class="text-purple-600 hover:text-purple-500">Terms</a> and <a href="#" class="text-purple-600 hover:text-purple-500">Privacy Policy</a></label>
-        </div>
+
+        <button type="submit"
+            class="w-full py-3 px-4 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-medium shadow-md transition">
+            Create Artist Account
+        </button>
+    </form>
+
+    <div class="divider">or sign up with</div>
+
+    <div class="grid grid-cols-2 gap-3">
+        <a href="#" class="flex items-center justify-center py-2 px-4 rounded-lg bg-white text-gray-700 shadow hover:bg-gray-100">
+            <i class="fab fa-google text-red-500 mr-2"></i> Google
+        </a>
+        <a href="#" class="flex items-center justify-center py-2 px-4 rounded-lg bg-white text-gray-700 shadow hover:bg-gray-100">
+            <i class="fab fa-github text-gray-800 mr-2"></i> GitHub
+        </a>
     </div>
-
-    <button type="submit" 
-            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 btn-transition">
-        Create Artist Account
-    </button>
-</form>
-
-<div class="divider">or sign up with</div>
-
-<div class="grid grid-cols-2 gap-3">
-    <a href="#" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 btn-transition">
-        <i class="fab fa-google text-red-500 mr-2"></i> Google
-    </a>
-    <a href="#" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 btn-transition">
-        <i class="fab fa-github text-gray-800 mr-2"></i> GitHub
-    </a>
 </div>
+@endsection
 
 @section('footer-links')
-    <p class="text-gray-600">Already have an account? <a href="{{ route('login') }}" class="font-medium text-purple-600 hover:text-purple-500">Sign in</a></p>
+    <p>Already have an account? 
+        <a href="{{ route('login') }}" class="text-purple-400 underline">Sign in</a>
+    </p>
 @endsection
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const passwordInput = document.getElementById('password');
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('password');
     const requirements = {
-        length: document.querySelector('[data-requirement="length"]'),
-        uppercase: document.querySelector('[data-requirement="uppercase"]'),
-        lowercase: document.querySelector('[data-requirement="lowercase"]'),
-        number: document.querySelector('[data-requirement="number"]'),
-        special: document.querySelector('[data-requirement="special"]')
+        length: v => v.length >= 8,
+        uppercase: v => /[A-Z]/.test(v),
+        lowercase: v => /[a-z]/.test(v),
+        number: v => /\d/.test(v),
+        special: v => /[@$!%*#?&]/.test(v),
     };
 
-    passwordInput.addEventListener('input', function() {
-        const value = this.value;
-        
-        // Check each requirement
-        const hasLength = value.length >= 8;
-        const hasUppercase = /[A-Z]/.test(value);
-        const hasLowercase = /[a-z]/.test(value);
-        const hasNumber = /[0-9]/.test(value);
-        const hasSpecial = /[@$!%*#?&]/.test(value);
-        
-        // Update requirement indicators
-        toggleClass(requirements.length, hasLength);
-        toggleClass(requirements.uppercase, hasUppercase);
-        toggleClass(requirements.lowercase, hasLowercase);
-        toggleClass(requirements.number, hasNumber);
-        toggleClass(requirements.special, hasSpecial);
-    });
-
-    function toggleClass(element, isValid) {
-        if (isValid) {
-            element.classList.add('text-green-500');
-            element.classList.remove('text-gray-500');
-        } else {
-            element.classList.add('text-gray-500');
-            element.classList.remove('text-green-500');
-        }
+    const elements = {};
+    for (const key in requirements) {
+        elements[key] = document.querySelector(`[data-requirement="${key}"]`);
     }
+
+    input.addEventListener('input', () => {
+        const value = input.value;
+        let shown = false;
+
+        for (const key in requirements) {
+            elements[key].classList.add('hidden');
+            elements[key].classList.remove('text-green-400');
+
+            if (!shown && !requirements[key](value)) {
+                elements[key].classList.remove('hidden');
+                shown = true;
+            } else if (requirements[key](value)) {
+                elements[key].classList.remove('hidden');
+                elements[key].classList.add('text-green-400');
+            }
+        }
+    });
 });
 </script>
 @endpush
-@endsection

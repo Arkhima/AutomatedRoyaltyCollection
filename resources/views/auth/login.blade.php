@@ -1,14 +1,23 @@
 @extends('layouts.Auth')
 
 @section('title', 'Sign In')
-@section('subtitle', 'Welcome back! Please enter your details')
+@section('subtitle', 'Welcome back to ARC! Please enter your details')
 
 @section('content')
+
+{{-- Optional logo --}}
+{{-- Uncomment and replace the src path if you want to use a logo --}}
+{{--
+<div class="flex justify-center mb-6">
+    <img src="{{ asset('images/arc-logo.png') }}" alt="ARC Logo" class="h-12">
+</div>
+--}}
+
 <form class="space-y-6" action="{{ route('login') }}" method="POST">
     @csrf
-    
+
     <div>
-        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+        <label for="email" class="block text-sm font-medium text-white mb-1">Email Address</label>
         <input id="email" name="email" type="email" autocomplete="email" required
                class="w-full px-4 py-3 rounded-lg border border-gray-300 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent input-focus"
                placeholder="your@email.com">
@@ -16,7 +25,7 @@
 
     <div>
         <div class="flex justify-between items-center mb-1">
-            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+            <label for="password" class="block text-sm font-medium text-white">Password</label>
             <a href="{{ route('password.request') }}" class="text-xs text-purple-600 hover:text-purple-500">Forgot password?</a>
         </div>
         <input id="password" name="password" type="password" autocomplete="current-password" required
@@ -26,7 +35,7 @@
 
     <div class="flex items-center">
         <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
-        <label for="remember-me" class="ml-2 block text-sm text-gray-700">Remember me</label>
+        <label for="remember-me" class="ml-2 block text-sm text-white">Remember me</label>
     </div>
 
     <button type="submit" 
@@ -47,6 +56,7 @@
 </div>
 
 @section('footer-links')
-    <p class="text-gray-600">Don't have an account? <a href="{{ route('register') }}" class="font-medium text-purple-600 hover:text-purple-500">Sign up</a></p>
+    <p class="text-white">Don't have an account? <a href="{{ route('register') }}" class="font-medium text-purple-600 hover:text-purple-500">Sign up</a></p>
 @endsection
+
 @endsection

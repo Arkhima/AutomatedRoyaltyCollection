@@ -74,6 +74,9 @@ class ArtistProfileController extends Controller
     $artist->twitter = $validated['twitter'] ?? null;
     $artist->save();
 
+    Auth::setUser($user);
+
+
     return redirect()->route('Artists.Profile.show')->with('success', 'Profile updated successfully.');
 }
 

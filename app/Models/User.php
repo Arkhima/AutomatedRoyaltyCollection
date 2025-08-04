@@ -39,4 +39,12 @@ class User extends Authenticatable
     {
         return $this->hasOne(Artist::class);
     }
+
+    public function getProfilePhotoUrlAttribute()
+{
+    return $this->avatar_url 
+        ? asset($this->avatar_url) 
+        : 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&background=1c2541&color=fff';
+}
+
 }

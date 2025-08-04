@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Artist Dashboard | ARC</title>
@@ -401,6 +405,18 @@
       .user-profile a span {
         display: none;
       }
+
+      #page-loader {
+  opacity: 0.5;
+  pointer-events: auto;
+}
+
+#page-loader.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+
     }
 
     @media (max-width: 480px) {
@@ -426,10 +442,59 @@
     .floating {
       animation: float 3s ease-in-out infinite;
     }
+
+    /* Creative Marquee Styling */
+.marquee-container {
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--accent-color);
+  user-select: none;
+  font-family: 'Playfair Display', serif;
+}
+
+.marquee-content {
+  display: inline-block;
+  padding-left: 100%;
+  animation: creative-marquee 4s linear infinite;
+}
+
+.marquee-container:hover .marquee-content {
+  animation-play-state: paused;
+}
+
+@keyframes creative-marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
   </style>
 </head>
 
 <body>
+  <!-- Vinyl Record Spinner with Creative Text -->
+<div id="page-loader" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-opacity duration-500"
+     style="background: rgba(28, 37, 65, 0.98);">
+  <div class="w-16 h-16 border-[6px] border-yellow-400 border-t-white rounded-full animate-spin relative">
+    <div class="absolute top-1/2 left-1/2 w-4 h-4 bg-black rounded-full transform -translate-x-1/2 -translate-y-1/2"></div>
+  </div>
+  <p class="mt-4 text-yellow-400 font-semibold tracking-wide text-lg select-none" style="font-family: 'Playfair Display', serif;">
+    Loading Your Groove data…
+    <div class="marquee-container text-sm sm:text-base">
+            <div class="marquee-content">
+                  🎧 Please be patient 🎶
+              </div>
+    </div>
+  </p>
+</div>
+
+
   <div class="layout-container" id="layout">
     <!-- Sidebar -->
     <aside class="sidebar">
@@ -607,6 +672,14 @@
     // Run on load and resize
     updateGreeting();
     window.addEventListener('resize', updateGreeting);
+
+    window.addEventListener('load', () => {
+  const loader = document.getElementById('page-loader');
+  setTimeout(() => {
+    loader.classList.add('opacity-0', 'pointer-events-none');
+    setTimeout(() => loader.remove(), 500); // fade out duration
+  }, 1900); // <-- delay before fading out (2000ms = 2 seconds)
+});
     
     // Add floating animation to random elements
     document.addEventListener('DOMContentLoaded', function() {
