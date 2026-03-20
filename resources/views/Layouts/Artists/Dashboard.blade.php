@@ -512,13 +512,7 @@
               </a>
             </li>
 
-          <li>
-            <a href="{{ route('Artists.Profile.show') }}" class="{{ request()->routeIs('Artists.Profile.*') ? 'active' : '' }}">
-              <i class="fas fa-user"></i>
-              <span>Artist</span>
-            </a>
-          </li>
-
+          
           @if(Auth::check() && Auth::user()->is_admin)
             <li>
               <a href="{{ route('Admin.Dashboard.index') }}" class="{{ request()->routeIs('Admin.*') ? 'active' : '' }}">
@@ -562,6 +556,14 @@
                 <span>Payments</span>
               </a>
             </li>
+
+            <li>
+            <a href="{{ route('Artists.Profile.show') }}" class="{{ request()->routeIs('Artists.Profile.*') ? 'active' : '' }}">
+              <i class="fas fa-user"></i>
+              <span>Artist</span>
+            </a>
+          </li>
+
           </ul>
         </nav>
       </div>
