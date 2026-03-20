@@ -16,38 +16,47 @@ use App\Http\Controllers\Artists\{
     StreamController,
     RoyaltyController,
     ReportController,
-    PaymentController
+    PaymentController as ArtistPaymentController
 };
 use App\Http\Controllers\ArtistProfileController;
 
+// ============================================
+// USER/ARTIST ROUTES ONLY - No Admin Routes
+// ============================================
 
-// ✅ Fixed: Root Route now redirects based on authentication status
+// ✅ Root Route - Uses 'web' guard explicitly
 Route::get('/', function () {
-    if (Auth::check()) {
+    if (Auth::guard('web')->check()) {
         return redirect()->route('Artists.Dashboard.index');
     }
     return redirect()->route('login');
 });
 
-// Guest Routes
-Route::middleware('guest')->group(function () {
+// Guest Routes (Users only)
+Route::middleware('guest:web')->group(function () {
+    // Artist/User Login
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login']);
     
+    // Registration (only for artists/users)
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
 
+    // Password reset routes (users only)
     Route::get('forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
     Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
-
     Route::get('reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
     Route::post('reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
 });
 
-Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth')->name('logout');
+// Logout (Users only)
+Route::post('/logout', [LoginController::class, 'logout'])
+    ->middleware('auth:web')
+    ->name('logout');
 
-// Protected Artist Routes
-Route::middleware(['auth'])->group(function () {
+// Protected Artist Routes - 'auth' defaults to 'web' guard
+Route::middleware(['auth:web'])->group(function () {
+    
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('Artists.Dashboard.index');
 
@@ -64,19 +73,6 @@ Route::middleware(['auth'])->group(function () {
         'update'  => 'Artists.Tracks.update',
         'destroy' => 'Artists.Tracks.destroy',
     ]);
-
-    // Artist Profile Routes (resource under prefix)
-    Route::prefix('artist-profile')->name('Artists.ArtistSection.')->group(function () {
-        Route::resource('', ArtistController::class)->parameters(['' => 'artist'])->names([
-            'index'   => 'index',
-            'create'  => 'create',
-            'store'   => 'store',
-            'show'    => 'show',
-            'edit'    => 'edit',
-            'update'  => 'update',
-            'destroy' => 'destroy',
-        ]);
-    });
 
     // Stream Routes
     Route::prefix('streams')->name('Artists.Streams.')->group(function () {
@@ -98,13 +94,13 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [ReportController::class, 'index'])->name('index');
         Route::get('/generate/{format?}', [ReportController::class, 'generate'])
             ->name('generate')
-            ->where('format', 'pdf|excel'); // Optional 'pdf' or 'excel' format parameter
+            ->where('format', 'pdf|excel');
     });
 
-    // Payment Routes
+    // Artist Payment Routes (for artists to request payments)
     Route::prefix('payments')->name('Artists.Payments.')->group(function () {
-        Route::get('/', [PaymentController::class, 'index'])->name('index');
-        Route::get('/history', [PaymentController::class, 'history'])->name('history');
-        Route::post('/request', [PaymentController::class, 'request'])->name('request'); // Added route for withdrawal request
+        Route::get('/', [ArtistPaymentController::class, 'index'])->name('index');
+        Route::get('/history', [ArtistPaymentController::class, 'history'])->name('history');
+        Route::post('/request', [ArtistPaymentController::class, 'request'])->name('request');
     });
 });

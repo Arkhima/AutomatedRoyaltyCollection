@@ -20,3 +20,14 @@
     0%   { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* App custom utilities */
+.btn-primary-custom {
+    @apply inline-flex items-center px-5 py-3 rounded-md font-semibold text-white shadow-md transform transition-transform duration-150;
+}
+.btn-primary-custom:hover { @apply -translate-y-0.5 shadow-lg; }
+.table-row-hover:hover { @apply bg-gray-50; }
+.muted { color: #6b7280; }
+
+/* Responsive card for catalog */
+.catalog-card { @apply bg-white rounded-xl shadow-md overflow-hidden; }

@@ -513,11 +513,20 @@
             </li>
 
           <li>
-<a href="{{ route('Artists.ArtistSection.index') }}" class="{{ request()->routeIs('Artists.ArtistSection.*') ? 'active' : '' }}">
-<i class="fas fa-user"></i>
-<span>Artist</span>
- </a>
-</li>
+            <a href="{{ route('Artists.Profile.show') }}" class="{{ request()->routeIs('Artists.Profile.*') ? 'active' : '' }}">
+              <i class="fas fa-user"></i>
+              <span>Artist</span>
+            </a>
+          </li>
+
+          @if(Auth::check() && Auth::user()->is_admin)
+            <li>
+              <a href="{{ route('Admin.Dashboard.index') }}" class="{{ request()->routeIs('Admin.*') ? 'active' : '' }}">
+                <i class="fas fa-shield-alt"></i>
+                <span>Admin</span>
+              </a>
+            </li>
+          @endif
 
             <li>
               <a href="{{ route('Artists.Tracks.index') }}" class="{{ request()->routeIs('Artists.Tracks.*') ? 'active' : '' }}">

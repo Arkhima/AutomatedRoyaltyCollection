@@ -22,9 +22,9 @@ class Royalty extends Model
     // Disable timestamps if your table does not have created_at or updated_at
     public $timestamps = false;
 
-    // Cast calculation_date to a datetime (Carbon instance)
+    // Cast calculation_date to a date (Carbon instance)
     protected $casts = [
-        'calculation_date' => 'datetime',
+        'calculation_date' => 'date',
     ];
 
     // Relationships

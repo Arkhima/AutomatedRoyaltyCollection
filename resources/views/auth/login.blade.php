@@ -19,8 +19,8 @@
     <div>
         <label for="email" class="block text-sm font-medium text-white mb-1">Email Address</label>
         <input id="email" name="email" type="email" autocomplete="email" required
-               class="w-full px-4 py-3 rounded-lg border border-gray-300 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent input-focus"
-               placeholder="your@email.com">
+               class="w-full px-4 py-3 rounded-lg border border-black-800 placeholder-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent input-focus"
+               placeholder="your@email.com" value="{{ old('email') }}">
     </div>
 
     <div>
@@ -34,8 +34,8 @@
     </div>
 
     <div class="flex items-center">
-        <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
-        <label for="remember-me" class="ml-2 block text-sm text-white">Remember me</label>
+        <input id="remember" name="remember" type="checkbox" class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
+        <label for="remember" class="ml-2 block text-sm text-white">Remember me</label>
     </div>
 
     <button type="submit" 

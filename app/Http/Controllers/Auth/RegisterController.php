@@ -17,43 +17,59 @@ class RegisterController extends Controller
     }
 
     public function register(Request $request)
-{
-    $validated = $request->validate([
-        'name'     => ['required', 'string', 'max:255'],
-        'email'    => ['required', 'email', 'max:255', 'unique:users'],
-        'password' => [
-            'required',
-            'string',
-            'min:8',
-            'regex:/[A-Z]/',      // at least one uppercase
-            'regex:/[a-z]/',      // at least one lowercase
-            'regex:/[0-9]/',      // at least one number
-            'regex:/[@$!%*#?&]/', // at least one special char
-            'confirmed'
-        ]
-    ]);
+    {
+        $validated = $request->validate([
+            'name'        => ['required', 'string', 'max:255'],
+            'email'       => ['required', 'email', 'max:255', 'unique:users'],
+            'password'    => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/[A-Z]/',      // at least one uppercase
+                'regex:/[a-z]/',      // at least one lowercase
+                'regex:/[0-9]/',      // at least one number
+                'regex:/[@$!%*#?&]/', // at least one special char
+                'confirmed'
+            ],
+            'artist_name' => ['required', 'string', 'max:255'],
+            'phone'       => ['required', 'string', 'max:20'],
+        ]);
 
-    // Step 1: Create the user (without artist_id yet)
-    $user = User::create([
-        'name'     => $validated['name'],
-        'email'    => $validated['email'],
-        'password' => Hash::make($validated['password']),
-    ]);
+        // Create the user (NO artist_id field needed)
+        $user = User::create([
+            'name'         => $validated['name'],
+            'email'        => $validated['email'],
+            'password'     => Hash::make($validated['password']),
+            'phone_number' => $validated['phone'],
+        ]);
 
-    // Step 2: Create the artist and link it to the user
-    $artist = Artist::create([
-        'user_id' => $user->id, // this is the important link
-        'name'    => $user->name,
-        'email'   => $user->email,
-    ]);
+        // Check if there's an unclaimed artist with this email
+        $existingArtist = Artist::where('email', $user->email)
+                                 ->whereNull('user_id')
+                                 ->first();
 
-    // Step 3 (optional): store artist_id back into user, if you're using it
-    $user->artist_id = $artist->id;
-    $user->save();
+        if ($existingArtist) {
+            // Claim this artist
+            $existingArtist->update([
+                'user_id'    => $user->id,
+                'name'       => $validated['artist_name'],
+                'stage_name' => $validated['artist_name'],
+                'phone'      => $validated['phone'],
+            ]);
+        } else {
+            // Create a new artist for this user
+            Artist::create([
+                'user_id'    => $user->id,
+                'name'       => $validated['artist_name'],
+                'stage_name' => $validated['artist_name'],
+                'email'      => $user->email,  // Use the user's email
+                'phone'      => $validated['phone'],
+            ]);
+        }
 
-    // Step 4: Log in and redirect
-    Auth::login($user);
+        // Log the user in
+        Auth::login($user);
 
-    return redirect('/dashboard')->with('success', 'Account created and artist profile set up.');
-}
+        return redirect('/dashboard')->with('success', 'Account created and artist profile set up.');
+    }
 }

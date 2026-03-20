@@ -76,6 +76,44 @@
                     @enderror
                 </div>
 
+                <!-- Stage Name -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700 flex items-center">
+                        <i class="fas fa-theater-masks text-purple-500 mr-2"></i>
+                        Stage Name
+                    </label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <input type="text" name="artist_name" value="{{ old('artist_name', $artist->stage_name ?? $artist->name ?? '') }}"
+                               class="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 pr-3 py-3 border-gray-300 rounded-md placeholder-gray-400"
+                               placeholder="Stage or performance name">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-user-tag text-gray-400"></i>
+                        </div>
+                    </div>
+                    @error('artist_name')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Phone -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700 flex items-center">
+                        <i class="fas fa-phone text-purple-500 mr-2"></i>
+                        Phone Number
+                    </label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <input type="text" name="phone" value="{{ old('phone', $artist->phone ?? $user->phone_number ?? '') }}"
+                               class="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 pr-3 py-3 border-gray-300 rounded-md placeholder-gray-400"
+                               placeholder="+254700000000">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-phone text-gray-400"></i>
+                        </div>
+                    </div>
+                    @error('phone')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <!-- Email Field -->
                 <div class="space-y-2">
                     <label class="block text-sm font-medium text-gray-700 flex items-center">

@@ -26,6 +26,20 @@
         </div>
 
         <div>
+            <label for="artist_name" class="block text-sm font-medium text-white mb-1">Artist / Stage Name</label>
+            <input id="artist_name" name="artist_name" type="text" value="{{ old('artist_name') }}" required
+                class="w-full px-4 py-3 rounded-lg border border-gray-400 bg-white bg-opacity-80 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500" 
+                placeholder="Your artist or stage name">
+        </div>
+
+        <div>
+            <label for="phone" class="block text-sm font-medium text-white mb-1">Phone Number</label>
+            <input id="phone" name="phone" type="text" value="{{ old('phone') }}" required
+                class="w-full px-4 py-3 rounded-lg border border-gray-400 bg-white bg-opacity-80 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500" 
+                placeholder="+254700000000">
+        </div>
+
+        <div>
             <label for="email" class="block text-sm font-medium text-white mb-1">Email Address</label>
             <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" required
                 class="w-full px-4 py-3 rounded-lg border border-gray-400 bg-white bg-opacity-80 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500" 

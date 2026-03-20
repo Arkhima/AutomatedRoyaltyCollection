@@ -9,13 +9,13 @@
                 <i class="fas fa-music text-purple-500 mr-3"></i>
                 My Music Catalog
             </h1>
-            <p class="text-gray-600 mt-1">Manage your tracks and streaming data</p>
+            <p class="text-gray-600 mt-1">Manage your tracks</p>
         </div>
-        <a href="{{ route('Artists.Tracks.create') }}"
-           class="inline-flex items-center px-4 py-3 bg-gradient-to-r from-purple-600 to-blue-600 border border-transparent rounded-md font-semibold text-white uppercase tracking-widest hover:from-purple-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200">
-           <i class="fas fa-plus-circle mr-2"></i>
-           Add New Track
-        </a>
+          <a href="{{ route('Artists.Tracks.create') }}"
+              class="btn-primary-custom bg-gradient-to-r from-purple-600 to-indigo-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+              <i class="fas fa-plus-circle mr-3 text-lg"></i>
+              <span class="uppercase tracking-widest">Add New Track</span>
+          </a>
     </div>
 
     @if(session('success'))
@@ -33,7 +33,7 @@
         </div>
     @endif
 
-    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+    <div class="catalog-card">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gradient-to-r from-gray-800 to-gray-900">
@@ -57,7 +57,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($tracks as $track)
-                    <tr class="hover:bg-gray-50 transition-colors">
+                    <tr class="table-row-hover transition-colors">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0 h-10 w-10 bg-purple-100 rounded-full flex items-center justify-center">
@@ -65,7 +65,7 @@
                                 </div>
                                 <div class="ml-4">
                                     <div class="text-sm font-medium text-gray-900">{{ $track->title }}</div>
-                                    <div class="text-sm text-gray-500">{{ $track->genre ?? 'Various' }}</div>
+                                    <div class="text-sm muted">{{ $track->genre ?? 'Various' }}</div>
                                 </div>
                             </div>
                         </td>
@@ -81,22 +81,20 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <div class="flex space-x-4">
+                            <div class="flex items-center space-x-3">
                                 <a href="{{ route('Artists.Tracks.edit', $track->id) }}" 
-                                   class="text-blue-600 hover:text-blue-900 flex items-center"
-                                   title="Edit Track">
-                                    <i class="fas fa-edit mr-1"></i>
-                                    <span class="hidden md:inline">Edit</span>
+                                   class="inline-flex items-center px-3 py-2 rounded-md bg-white border text-indigo-600 hover:bg-indigo-50 shadow-sm">
+                                    <i class="fas fa-edit mr-2"></i>
+                                    <span class="text-sm">Edit</span>
                                 </a>
                                 <form method="POST" action="{{ route('Artists.Tracks.destroy', $track->id) }}" class="inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit"
                                             onclick="return confirm('Are you sure you want to delete this track?')"
-                                            class="text-red-600 hover:text-red-900 flex items-center"
-                                            title="Delete Track">
-                                        <i class="fas fa-trash-alt mr-1"></i>
-                                        <span class="hidden md:inline">Delete</span>
+                                            class="inline-flex items-center px-3 py-2 rounded-md bg-white border text-red-600 hover:bg-red-50 shadow-sm">
+                                        <i class="fas fa-trash-alt mr-2"></i>
+                                        <span class="text-sm">Delete</span>
                                     </button>
                                 </form>
                             </div>

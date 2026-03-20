@@ -69,27 +69,25 @@
                 </div>
             </div>
 
-            <!-- Artist Selection -->
-            <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
-                    <i class="fas fa-user text-purple-500 mr-2"></i>
-                    Primary Artist
-                </label>
-                <div class="mt-1 relative rounded-md shadow-sm">
-                    <select name="artist_id" class="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 pr-3 py-3 border-gray-300 rounded-md">
-                        <option disabled>Select an Artist</option>
-                        @foreach($artists as $artist)
-                            <option value="{{ $artist->id }}"
-                                {{ old('artist_id', $track->artist_id) == $artist->id ? 'selected' : '' }}>
-                                {{ $artist->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fas fa-users text-gray-400"></i>
+            <!-- Artist (auto-assigned) -->
+            @if(isset($artist) && $artist)
+                <input type="hidden" name="artist_id" value="{{ $artist->id }}">
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                        <i class="fas fa-user text-purple-500 mr-2"></i>
+                        Primary Artist
+                    </label>
+                    <div class="mt-1 text-sm text-gray-700">
+                        <strong>{{ $artist->name }}</strong>
                     </div>
                 </div>
-            </div>
+            @else
+                <div class="mb-6">
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md text-sm text-yellow-800">
+                        You do not have an artist profile yet. Please create your artist profile before editing tracks.
+                    </div>
+                </div>
+            @endif
 
             <!-- Royalty Rate -->
             <div class="mb-6">

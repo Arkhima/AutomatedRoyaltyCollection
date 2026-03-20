@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Artists;
+namespace App\Http\Controllers\Archived;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -29,11 +29,7 @@ class ArtistController extends Controller
             'phone' => 'nullable|string|max:20',
             'bank_details' => 'nullable|string',
             'national_id' => 'nullable|string',
-            // 'mpesa_paybill' removed
-            // 'profile_image' removed
         ]);
-
-        // Removed profile_image upload logic
 
         Artist::create($data);
 
@@ -58,11 +54,7 @@ class ArtistController extends Controller
             'phone' => 'nullable|string|max:20',
             'bank_details' => 'nullable|string',
             'national_id' => 'nullable|string',
-            // 'mpesa_paybill' removed
-            // 'profile_image' removed
         ]);
-
-        // Removed profile_image upload logic and deletion
 
         $artist->update($data);
 
@@ -73,8 +65,6 @@ class ArtistController extends Controller
     public function destroy($id)
     {
         $artist = Artist::findOrFail($id);
-
-        // Removed profile_image deletion
 
         $artist->delete();
 
