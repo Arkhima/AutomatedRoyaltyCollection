@@ -44,30 +44,41 @@ Route::prefix($adminPath)
             Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
             Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard.alt');
 
-            // USERS
+            // USERS (FULL CRUD)
             Route::get('/users', [UsersController::class, 'index'])->name('users.index');
+            Route::get('/users/create', [UsersController::class, 'create'])->name('users.create');
+            Route::post('/users', [UsersController::class, 'store'])->name('users.store');
             Route::get('/users/{user}', [UsersController::class, 'show'])->name('users.show');
             Route::post('/users/{user}/toggle-status', [UsersController::class, 'toggleStatus'])->name('users.toggle-status');
+            Route::delete('/users/{user}', [UsersController::class, 'destroy'])->name('users.destroy');
 
-            // ARTISTS
+            // ARTISTS (FULL CRUD)
             Route::get('/artists', [ArtistsController::class, 'index'])->name('artists.index');
+            Route::get('/artists/create', [ArtistsController::class, 'create'])->name('artists.create');
+            Route::post('/artists', [ArtistsController::class, 'store'])->name('artists.store');
             Route::get('/artists/{artist}', [ArtistsController::class, 'show'])->name('artists.show');
+            Route::delete('/artists/{artist}', [ArtistsController::class, 'destroy'])->name('artists.destroy');
 
-            // TRACKS
+            // TRACKS (with exports)
             Route::get('/tracks', [TracksController::class, 'index'])->name('tracks.index');
+            Route::get('/tracks/create', [TracksController::class, 'create'])->name('tracks.create');
+            Route::post('/tracks', [TracksController::class, 'store'])->name('tracks.store');
             Route::get('/tracks/{track}', [TracksController::class, 'show'])->name('tracks.show');
+            Route::delete('/tracks/{track}', [TracksController::class, 'destroy'])->name('tracks.destroy');
+            Route::get('/tracks/export/csv', [TracksController::class, 'exportCsv'])->name('tracks.export.csv');
+            Route::get('/tracks/export/pdf', [TracksController::class, 'exportPdf'])->name('tracks.export.pdf');
 
             // SEARCH
             Route::get('/search', [SearchController::class, 'index'])->name('search.index');
             Route::get('/search/quick', [SearchController::class, 'quick'])->name('search.quick');
 
-            // PAYMENTS
+            // PAYMENTS (FIXED - Changed {id} to {payment} for model binding)
             Route::prefix('payments')->name('payments.')->group(function () {
                 Route::get('/', [AdminPaymentsController::class, 'index'])->name('index');
-                Route::get('/{id}', [AdminPaymentsController::class, 'show'])->name('show');
-                Route::post('/{id}/approve', [AdminPaymentsController::class, 'approve'])->name('approve');
-                Route::post('/{id}/reject', [AdminPaymentsController::class, 'reject'])->name('reject');
-                Route::post('/{id}/complete', [AdminPaymentsController::class, 'complete'])->name('complete');
+                Route::get('/{payment}', [AdminPaymentsController::class, 'show'])->name('show');
+                Route::post('/{payment}/approve', [AdminPaymentsController::class, 'approve'])->name('approve');
+                Route::post('/{payment}/reject', [AdminPaymentsController::class, 'reject'])->name('reject');
+                Route::post('/{payment}/complete', [AdminPaymentsController::class, 'complete'])->name('complete');
                 Route::post('/bulk-action', [AdminPaymentsController::class, 'bulkAction'])->name('bulk');
                 Route::get('/export/csv', [AdminPaymentsController::class, 'export'])->name('export');
             });

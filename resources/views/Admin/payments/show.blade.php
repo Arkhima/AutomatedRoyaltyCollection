@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('Layouts.Admin.admin')
 
 @section('title', 'Payment Details')
 @section('breadcrumb', 'Admin / Payments / Details')
@@ -44,10 +44,10 @@
 
             @if($payment->status == 'pending')
             <div class="flex gap-3 border-t pt-6">
-                <form action="{{ route('Admin.Payments.approve', $payment->id) }}" method="POST">
+                <form action="{{ route('admin.payments.approve', $payment->id) }}" method="POST">
                     @csrf
                     <button type="submit" class="admin-btn admin-btn-primary text-lg px-6 py-3"
-                            onclick="return confirm('Approve this payment?')">
+                            onclick="return confirm('Approve this payment of KES {{ number_format($payment->amount) }}?')">
                         <i class="fas fa-check mr-2"></i> Approve Payment
                     </button>
                 </form>
@@ -61,7 +61,7 @@
 
             @if($payment->status == 'approved')
             <div class="border-t pt-6">
-                <form action="{{ route('Admin.Payments.complete', $payment->id) }}" method="POST">
+                <form action="{{ route('admin.payments.complete', $payment->id) }}" method="POST">
                     @csrf
                     <button type="submit" class="admin-btn admin-btn-primary"
                             onclick="return confirm('Mark this payment as completed?')">
@@ -110,7 +110,7 @@
             </div>
 
             <div class="border-t mt-4 pt-4">
-                <a href="{{ route('Admin.Artists.edit', $payment->artist_id) ?? '#' }}" 
+                <a href="{{ route('admin.artists.show', $payment->artist_id) }}" 
                    class="text-yellow-500 hover:text-yellow-600">
                     View Artist Profile <i class="fas fa-arrow-right ml-1"></i>
                 </a>
@@ -170,7 +170,8 @@
 function showRejectModal(paymentId) {
     const modal = document.getElementById('rejectModal');
     const form = document.getElementById('rejectForm');
-    form.action = "{{ url('admin/payments') }}/" + paymentId + "/reject";
+    // Use the correct admin path from env
+    form.action = "{{ url(env('ADMIN_PATH', 'system-access') . '/payments') }}/" + paymentId + "/reject";
     modal.classList.remove('hidden');
     modal.classList.add('flex');
 }

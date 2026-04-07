@@ -66,7 +66,7 @@
       <i class="fas fa-history text-purple-500 mr-3"></i>
       Recent Royalty Transactions
     </h2>
-    <a href="#" class="text-sm font-medium text-purple-600 hover:text-purple-800 flex items-center">
+    <a href="{{ route('Artists.Royalties.index') }}" class="text-sm font-medium text-purple-600 hover:text-purple-800 flex items-center">
       View All <i class="fas fa-chevron-right ml-1"></i>
     </a>
   </div>

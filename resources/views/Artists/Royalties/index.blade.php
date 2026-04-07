@@ -17,50 +17,53 @@
         <form method="GET" action="{{ route('Artists.Royalties.index') }}">
             <div class="p-6">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <!-- Artist Filter -->
+                    <!-- Artist Display (Read-only) -->
                     <div>
-                        <label for="artist_id" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                        <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
                             <i class="fas fa-user text-purple-500 mr-2"></i>
                             Artist
                         </label>
-                        <select name="artist_id" id="artist_id" class="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 pr-3 py-2 border-gray-300 rounded-md">
-                            <option value="">All Artists</option>
-                            @foreach ($artists as $artist)
-                                <option value="{{ $artist->id }}" {{ (string)$artist->id === (string) old('artist_id', $selectedArtist) ? 'selected' : '' }}>
-                                    {{ $artist->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <div class="relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-user-circle text-gray-400"></i>
+                            </div>
+                            <div class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-900 font-semibold">
+                                {{ $artist->name ?? $artist->user->name ?? 'Unknown Artist' }}
+                            </div>
+                        </div>
+                        <!-- Hidden input to maintain artist_id if needed for backend -->
+                        <input type="hidden" name="artist_id" value="{{ $artist->id }}">
                     </div>
 
-                    <!-- Date Range -->
+                    <!-- Start Date -->
                     <div>
                         <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
                             <i class="fas fa-calendar-alt text-purple-500 mr-2"></i>
                             Start Date
                         </label>
                         <div class="relative rounded-md shadow-sm">
-                            <input type="date" name="start_date" id="start_date" 
-                                   class="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 pr-3 py-2 border-gray-300 rounded-md"
-                                   value="{{ old('start_date', $startDate) }}">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <i class="fas fa-calendar text-gray-400"></i>
                             </div>
+                            <input type="date" name="start_date" id="start_date" 
+                                   class="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 pr-3 py-2 border-gray-300 rounded-md"
+                                   value="{{ old('start_date', $startDate) }}">
                         </div>
                     </div>
 
+                    <!-- End Date -->
                     <div>
                         <label for="end_date" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
                             <i class="fas fa-calendar-alt text-purple-500 mr-2"></i>
                             End Date
                         </label>
                         <div class="relative rounded-md shadow-sm">
-                            <input type="date" name="end_date" id="end_date" 
-                                   class="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 pr-3 py-2 border-gray-300 rounded-md"
-                                   value="{{ old('end_date', $endDate) }}">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <i class="fas fa-calendar text-gray-400"></i>
                             </div>
+                            <input type="date" name="end_date" id="end_date" 
+                                   class="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 pr-3 py-2 border-gray-300 rounded-md"
+                                   value="{{ old('end_date', $endDate) }}">
                         </div>
                     </div>
 
@@ -81,56 +84,53 @@
         </form>
     </div>
 
-    
-    @if($hasFilters)
-        <!-- Summary Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <!-- Total Streams -->
-            <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                <div class="p-6">
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
-                            <i class="fas fa-headphones text-xl"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-500">Total Streams</p>
-                            <p class="text-2xl font-semibold text-gray-900">{{ number_format($totalStreams) }}</p>
-                        </div>
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Total Streams -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                        <i class="fas fa-headphones text-xl"></i>
                     </div>
-                </div>
-            </div>
-
-            <!-- Total Royalties -->
-            <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                <div class="p-6">
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
-                            <i class="fas fa-coins text-xl"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-500">Total Royalties</p>
-                            <p class="text-2xl font-semibold text-green-600">Ksh. {{ number_format($totalRoyalties, 2) }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Average Rate -->
-            <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                <div class="p-6">
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
-                            <i class="fas fa-chart-line text-xl"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-500">Avg. Rate/Stream</p>
-                            <p class="text-2xl font-semibold text-purple-600">Ksh. {{ number_format($averageRate, 4) }}</p>
-                        </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Total Streams</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ number_format($totalStreams) }}</p>
                     </div>
                 </div>
             </div>
         </div>
-    @endif
+
+        <!-- Total Royalties -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                        <i class="fas fa-coins text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Total Royalties</p>
+                        <p class="text-2xl font-semibold text-green-600">Ksh. {{ number_format($totalRoyalties, 2) }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Average Rate -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
+                        <i class="fas fa-chart-line text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Avg. Rate/Stream</p>
+                        <p class="text-2xl font-semibold text-purple-600">Ksh. {{ number_format($averageRate, 4) }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Royalty Table -->
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
@@ -179,9 +179,9 @@
                         <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
                             <i class="fas fa-search-dollar text-3xl text-gray-300 mb-2 block"></i>
                             @if($hasFilters)
-                                No royalty data found for the selected filters
+                                No royalty data found for the selected date range
                             @else
-                                Apply filters to view royalty calculations
+                                Select a date range to view your royalty calculations
                             @endif
                         </td>
                     </tr>

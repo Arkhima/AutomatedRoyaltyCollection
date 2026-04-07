@@ -20,11 +20,7 @@ use App\Http\Controllers\Artists\{
 };
 use App\Http\Controllers\ArtistProfileController;
 
-// ============================================
-// USER/ARTIST ROUTES ONLY - No Admin Routes
-// ============================================
-
-// ✅ Root Route - Uses 'web' guard explicitly
+// Root Route
 Route::get('/', function () {
     if (Auth::guard('web')->check()) {
         return redirect()->route('Artists.Dashboard.index');
@@ -32,29 +28,26 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// Guest Routes (Users only)
+// Guest Routes
 Route::middleware('guest:web')->group(function () {
-    // Artist/User Login
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login']);
     
-    // Registration (only for artists/users)
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
 
-    // Password reset routes (users only)
     Route::get('forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
     Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
     Route::get('reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
     Route::post('reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
 });
 
-// Logout (Users only)
+// Logout
 Route::post('/logout', [LoginController::class, 'logout'])
     ->middleware('auth:web')
     ->name('logout');
 
-// Protected Artist Routes - 'auth' defaults to 'web' guard
+// Protected Artist Routes
 Route::middleware(['auth:web'])->group(function () {
     
     // Dashboard
@@ -74,12 +67,13 @@ Route::middleware(['auth:web'])->group(function () {
         'destroy' => 'Artists.Tracks.destroy',
     ]);
 
-    // Stream Routes
+    // Stream Routes (UPDATED - Added generate-demo-track route)
     Route::prefix('streams')->name('Artists.Streams.')->group(function () {
         Route::get('/', [StreamController::class, 'index'])->name('index');
         Route::get('/upload', [StreamController::class, 'showUploadForm'])->name('upload.form');
         Route::post('/upload', [StreamController::class, 'upload'])->name('upload');
         Route::post('/generate-demo', [StreamController::class, 'generateDemo'])->name('generate-demo');
+        Route::post('/generate-demo-track/{track}', [StreamController::class, 'generateDemoForTrack'])->name('generate-demo-track');
         Route::get('/download-template', [StreamController::class, 'downloadTemplate'])->name('download-template');
     });
 
@@ -89,15 +83,15 @@ Route::middleware(['auth:web'])->group(function () {
         Route::get('/export', [RoyaltyController::class, 'export'])->name('export');
     });
 
-    // Report Routes
+    // Report Routes (CSV instead of Excel)
     Route::prefix('reports')->name('Artists.Reports.')->group(function () {
         Route::get('/', [ReportController::class, 'index'])->name('index');
         Route::get('/generate/{format?}', [ReportController::class, 'generate'])
             ->name('generate')
-            ->where('format', 'pdf|excel');
+            ->where('format', 'pdf|csv');
     });
 
-    // Artist Payment Routes (for artists to request payments)
+    // Artist Payment Routes
     Route::prefix('payments')->name('Artists.Payments.')->group(function () {
         Route::get('/', [ArtistPaymentController::class, 'index'])->name('index');
         Route::get('/history', [ArtistPaymentController::class, 'history'])->name('history');

@@ -54,7 +54,7 @@ class PaymentsController extends Controller
     }
 
     /**
-     * Show single payment details
+     * Show single payment details (Using route model binding)
      */
     public function show(Payment $payment)
     {
@@ -68,7 +68,7 @@ class PaymentsController extends Controller
     }
 
     /**
-     * Approve payment request
+     * Approve payment request (Using route model binding)
      */
     public function approve(Payment $payment)
     {
@@ -82,7 +82,7 @@ class PaymentsController extends Controller
     }
 
     /**
-     * Reject payment request
+     * Reject payment request (Using route model binding)
      */
     public function reject(Request $request, Payment $payment)
     {
@@ -102,7 +102,7 @@ class PaymentsController extends Controller
     }
 
     /**
-     * Mark payment as completed
+     * Mark payment as completed (Using route model binding)
      */
     public function complete(Payment $payment)
     {

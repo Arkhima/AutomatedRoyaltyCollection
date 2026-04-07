@@ -31,7 +31,7 @@
 
 <!-- Filters -->
 <div class="admin-card mb-6">
-    <form method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+    <form method="GET" action="{{ route('admin.payments.index') }}" class="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
             <input type="text" name="search" value="{{ request('search') }}" 
@@ -287,7 +287,7 @@ function showRejectModal(paymentId) {
     currentPaymentId = paymentId;
     const modal = document.getElementById('rejectModal');
     const form = document.getElementById('rejectForm');
-    form.action = "{{ url('admin/payments') }}/" + paymentId + "/reject";
+    form.action = "{{ url(env('ADMIN_PATH', 'system-access') . '/payments') }}/" + paymentId + "/reject";
     modal.classList.remove('hidden');
     modal.classList.add('flex');
 }

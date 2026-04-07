@@ -4,9 +4,23 @@
 @section('breadcrumb', 'Admin / Users')
 
 @section('content')
+
+<!-- Flash Messages -->
+@if(session('success'))
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+        {{ session('success') }}
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        {{ session('error') }}
+    </div>
+@endif
+
 <div class="flex justify-between items-center mb-6">
     <h2 class="text-2xl font-bold brand-font">Manage Users</h2>
-    <a href="{{ route('admin.users.index') }}" class="admin-btn admin-btn-primary">
+    <a href="{{ route('admin.users.create') }}" class="admin-btn admin-btn-primary">
         <i class="fas fa-plus"></i>
         Add New User
     </a>
@@ -14,7 +28,7 @@
 
 <!-- Filters -->
 <div class="admin-card mb-6">
-    <form method="GET" class="flex flex-wrap gap-4 items-end">
+    <form method="GET" action="{{ route('admin.users.index') }}" class="flex flex-wrap gap-4 items-end">
         <div class="flex-1 min-w-[200px]">
             <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
             <input type="text" name="search" value="{{ request('search') }}" 
@@ -87,12 +101,26 @@
                 <td>{{ $user->created_at->format('M d, Y') }}</td>
                 <td>
                     <div class="flex gap-2">
-                        <a href="{{ route('admin.users.index', $user) }}" 
-                           class="admin-btn admin-btn-secondary admin-btn-sm">
-                            <i class="fas fa-edit"></i>
+                        <!-- View Button (Fixed Route) -->
+                        <a href="{{ route('admin.users.show', $user) }}" 
+                           class="admin-btn admin-btn-secondary admin-btn-sm" title="View">
+                            <i class="fas fa-eye"></i>
                         </a>
+                        
+                        <!-- Toggle Status Button (NEW) -->
+                        <form method="POST" action="{{ route('admin.users.toggle-status', $user) }}" class="inline">
+                            @csrf
+                            <button type="submit" 
+                                    class="admin-btn admin-btn-sm {{ $user->status === 'active' ? 'admin-btn-warning' : 'admin-btn-success' }}"
+                                    title="{{ $user->status === 'active' ? 'Deactivate' : 'Activate' }}"
+                                    onclick="return confirm('Are you sure you want to {{ $user->status === 'active' ? 'deactivate' : 'activate' }} this user?')">
+                                <i class="fas {{ $user->status === 'active' ? 'fa-ban' : 'fa-check' }}"></i>
+                            </button>
+                        </form>
+
+                        <!-- Delete Button -->
                         <button onclick="deleteUser({{ $user->id }})" 
-                                class="admin-btn admin-btn-danger admin-btn-sm">
+                                class="admin-btn admin-btn-danger admin-btn-sm" title="Delete">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -109,7 +137,7 @@
     </table>
 </div>
 
-<!-- Pagination -->
+<!-- Pagination (Fixed to preserve filters) -->
 <div class="pagination">
     @if($users->onFirstPage())
         <span class="pagination-item disabled">◀ Previous</span>
@@ -132,7 +160,7 @@
     @endif
 </div>
 
-<!-- Delete Form (hidden) -->
+<!-- Delete Form (hidden) - Fixed to use dynamic admin path -->
 <form id="delete-form" method="POST" class="hidden">
     @csrf
     @method('DELETE')
@@ -143,10 +171,11 @@
 function deleteUser(userId) {
     if (confirm('Are you sure you want to delete this user?')) {
         const form = document.getElementById('delete-form');
-        form.action = `/admin/users/${userId}`;
+        form.action = "{{ url(env('ADMIN_PATH', 'system-access') . '/users') }}/" + userId;
         form.submit();
     }
 }
 </script>
 @endpush
+
 @endsection

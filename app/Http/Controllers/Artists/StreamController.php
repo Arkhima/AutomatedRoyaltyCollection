@@ -89,7 +89,10 @@ class StreamController extends Controller
         }
     }
 
-    public function generateDemo()
+    /**
+     * Generate realistic monthly stream data for the entire year
+     */
+    public function generateDemo(Request $request)
     {
         $artist = Auth::user()->artist;
 
@@ -97,16 +100,109 @@ class StreamController extends Controller
             return back()->with('error', 'You must have an artist profile to generate demo streams.');
         }
 
-        if ($artist->tracks()->count() === 0) {
+        $tracks = $artist->tracks;
+
+        if ($tracks->count() === 0) {
             return back()->with('error', 'Please upload at least one track before generating demo streams.');
         }
 
-        Artisan::call('usage:import', [
-            '--artist' => $artist->id,
-            '--count' => 50
-        ]);
+        $year = $request->input('year', Carbon::now()->year);
+        $streamsGenerated = 0;
 
-        return back()->with('success', '50 demo stream records generated for your tracks!');
+        // Generate data for each month of the year
+        foreach (range(1, 12) as $month) {
+            // Pick a random track from the artist's catalog
+            $track = $tracks->random();
+            
+            // Generate realistic stream count with some randomness
+            $baseStreams = rand(1000, 5000);
+            
+            // Add seasonal trends
+            $seasonalMultiplier = 1.0;
+            if (in_array($month, [5, 6, 7, 8])) {
+                $seasonalMultiplier = 1.3; // Summer boost
+            } elseif ($month == 12) {
+                $seasonalMultiplier = 1.5; // Holiday boost
+            } elseif (in_array($month, [1, 2])) {
+                $seasonalMultiplier = 0.8; // Post-holiday dip
+            }
+            
+            // Add growth trend
+            $growthMultiplier = 1 + (($month - 1) * 0.05);
+            
+            $streamCount = round($baseStreams * $seasonalMultiplier * $growthMultiplier);
+            
+            // Check if record already exists for this track/month/year
+            $exists = Stream::where('track_id', $track->id)
+                ->whereYear('as_of_date', $year)
+                ->whereMonth('as_of_date', $month)
+                ->exists();
+
+            if (!$exists) {
+                Stream::create([
+                    'track_id' => $track->id,
+                    'artist_id' => $artist->id,
+                    'stream_count' => $streamCount,
+                    'as_of_date' => Carbon::create($year, $month, 15),
+                    'source' => 'demo',
+                ]);
+                
+                $streamsGenerated++;
+            }
+        }
+
+        // Redirect to the first month that was generated so they can see the data
+        return redirect()
+            ->route('Artists.Streams.index', [
+                'month' => 1,  // January
+                'year' => $year
+            ])
+            ->with('success', "Generated {$streamsGenerated} months of realistic streaming data for year {$year}!");
+    }
+
+    /**
+     * Generate demo data for a specific track across all months
+     */
+    public function generateDemoForTrack(Request $request, Track $track)
+    {
+        $artist = Auth::user()->artist;
+
+        if (!$artist || $track->artist_id !== $artist->id) {
+            return back()->with('error', 'Unauthorized access to this track.');
+        }
+
+        $year = $request->input('year', Carbon::now()->year);
+        $streamsGenerated = 0;
+
+        foreach (range(1, 12) as $month) {
+            // Skip if already exists
+            $exists = Stream::where('track_id', $track->id)
+                ->whereYear('as_of_date', $year)
+                ->whereMonth('as_of_date', $month)
+                ->exists();
+
+            if (!$exists) {
+                $isHitMonth = rand(1, 100) > 70;
+                $baseStreams = $isHitMonth ? rand(5000, 15000) : rand(500, 3000);
+                
+                Stream::create([
+                    'track_id' => $track->id,
+                    'artist_id' => $artist->id,
+                    'stream_count' => $baseStreams,
+                    'as_of_date' => Carbon::create($year, $month, rand(1, 28)),
+                    'source' => 'demo_track',
+                ]);
+                
+                $streamsGenerated++;
+            }
+        }
+
+        return redirect()
+            ->route('Artists.Streams.index', [
+                'track_id' => $track->id,
+                'year' => $year
+            ])
+            ->with('success', "Generated {$streamsGenerated} months of data for '{$track->title}'!");
     }
 
     public function downloadTemplate()

@@ -14,6 +14,7 @@ class Stream extends Model
         'artist_id',
         'stream_count',
         'as_of_date',
+        'source',
     ];
 
     public function track()
