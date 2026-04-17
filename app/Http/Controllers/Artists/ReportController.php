@@ -32,14 +32,27 @@ class ReportController extends Controller
 
         $artistId = $artist->id;
 
+        // Get the actual date range from streams for this artist
+        $streamDateRange = \App\Models\Stream::whereHas('track', fn($q) => $q->where('artist_id', $artistId))
+            ->selectRaw('MIN(as_of_date) as min_date, MAX(as_of_date) as max_date')
+            ->first();
+
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
 
         try {
-            $startDate = $startDate ? Carbon::parse($startDate)->startOfDay() : Carbon::now()->subYear()->startOfDay();
-            $endDate = $endDate ? Carbon::parse($endDate)->endOfDay() : Carbon::now()->endOfDay();
+            // Use actual stream dates as defaults if available, otherwise fall back to current year
+            $defaultStartDate = $streamDateRange->min_date 
+                ? Carbon::parse($streamDateRange->min_date)->startOfDay() 
+                : Carbon::now()->startOfYear()->startOfDay();
+            $defaultEndDate = $streamDateRange->max_date 
+                ? Carbon::parse($streamDateRange->max_date)->endOfDay() 
+                : Carbon::now()->endOfDay();
+
+            $startDate = $startDate ? Carbon::parse($startDate)->startOfDay() : $defaultStartDate;
+            $endDate = $endDate ? Carbon::parse($endDate)->endOfDay() : $defaultEndDate;
         } catch (\Exception $e) {
-            $startDate = Carbon::now()->subYear()->startOfDay();
+            $startDate = Carbon::now()->startOfYear()->startOfDay();
             $endDate = Carbon::now()->endOfDay();
         }
 
@@ -145,14 +158,27 @@ class ReportController extends Controller
 
         $artistId = $artist->id;
 
+        // Get the actual date range from streams for this artist
+        $streamDateRange = \App\Models\Stream::whereHas('track', fn($q) => $q->where('artist_id', $artistId))
+            ->selectRaw('MIN(as_of_date) as min_date, MAX(as_of_date) as max_date')
+            ->first();
+
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
 
         try {
-            $startDate = $startDate ? Carbon::parse($startDate)->startOfDay() : Carbon::now()->subYear()->startOfDay();
-            $endDate = $endDate ? Carbon::parse($endDate)->endOfDay() : Carbon::now()->endOfDay();
+            // Use actual stream dates as defaults if available
+            $defaultStartDate = $streamDateRange->min_date 
+                ? Carbon::parse($streamDateRange->min_date)->startOfDay() 
+                : Carbon::now()->startOfYear()->startOfDay();
+            $defaultEndDate = $streamDateRange->max_date 
+                ? Carbon::parse($streamDateRange->max_date)->endOfDay() 
+                : Carbon::now()->endOfDay();
+
+            $startDate = $startDate ? Carbon::parse($startDate)->startOfDay() : $defaultStartDate;
+            $endDate = $endDate ? Carbon::parse($endDate)->endOfDay() : $defaultEndDate;
         } catch (\Exception $e) {
-            $startDate = Carbon::now()->subYear()->startOfDay();
+            $startDate = Carbon::now()->startOfYear()->startOfDay();
             $endDate = Carbon::now()->endOfDay();
         }
 
